@@ -44,7 +44,7 @@ Advanced Example:
 					}
 					return resp
 				},
-				WithHeader(
+				simular.WithHeader(
 					&http.Header{
 						"Api-Key": []string{"1234abcd"},
 					},
@@ -71,12 +71,12 @@ Advanced Example:
 					}
 					return resp, nil
 				},
-				WithHeader(
+				simular.WithHeader(
 					&http.Header{
 						"Api-Key": []string{"1234abcd"},
 					},
 				),
-				WithBody(
+				simular.WithBody(
 					bytes.NewBufferString(`{"title":"article"}`),
 				),
 			),
