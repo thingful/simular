@@ -20,6 +20,6 @@ before_install:
     - export PATH=$PATH:/tmp/
 
 install:
-    - dep ensure
+    - dep ensure -v
 
 script: make coverage
