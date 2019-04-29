@@ -299,42 +299,47 @@ func TestMockTransportWithQueryString(t *testing.T) {
 	RegisterStubRequests(
 		NewStubRequest(
 			"GET",
-			testURL+"?first=val&second=val",
+			"http://www.example.com/?first=val&second=val",
 			NewStringResponder(200, "hello world"),
 		))
 
-	// should error if no parameters passed
-	_, err := http.Get(testURL)
-	if err == nil {
-		t.Fatal("expected to receive a connection error due to lack of responders")
+	testcases := []struct {
+		label       string
+		url         string
+		shouldError bool
+	}{
+		{
+			"no query parameters",
+			"http://www.example.com/",
+			true,
+		},
+		{
+			"single query parameter only",
+			"http://www.example.com/?first=val",
+			true,
+		},
+		{
+			"extra parameters",
+			"http://www.example.com/?first=val&second=val&third=val",
+			true,
+		},
+		{
+			"correct but different order",
+			"http://www.example.com/?second=val&first=val",
+			false,
+		},
 	}
 
-	if err.Error() != "Get http://www.example.com/: Responder errors: Incorrect URL used" {
-		t.Errorf("Unxpected error: %s", err.Error())
-	}
-
-	// should error if if only one parameter passed
-	if _, err := http.Get(testURL + "?first=val"); err == nil {
-		t.Fatal("expected to receive a connection error due to lack of responders")
-	}
-	if _, err := http.Get(testURL + "?second=val"); err == nil {
-		t.Fatal("expected to receive a connection error due to lack of responders")
-	}
-
-	// should error if more parameters passed
-	if _, err := http.Get(testURL + "?first=val&second=val&third=val"); err == nil {
-		t.Fatal("expected to receive a connection error due to lack of responders")
-	}
-
-	// should not error if both parameters are sent
-	_, err = http.Get(testURL + "?first=val&second=val")
-	if err != nil {
-		t.Fatal("expected request to succeed")
-	}
-
-	_, err = http.Get(testURL + "?second=val&first=val")
-	if err != nil {
-		t.Fatal("expected request to succeed")
+	for _, tc := range testcases {
+		t.Run(tc.label, func(t *testing.T) {
+			_, err := http.Get(tc.url)
+			if err == nil && tc.shouldError {
+				t.Errorf("Expected an error but got none")
+			}
+			if err != nil && !tc.shouldError {
+				t.Errorf("Unexpected error: %v", err)
+			}
+		})
 	}
 }
 
