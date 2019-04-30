@@ -111,7 +111,7 @@ func (r *StubRequest) Matches(req *http.Request) error {
 		}
 
 		if bytes.Compare(stubBody, requestBody) != 0 {
-			return fmt.Errorf("Unexpected request body, expected %v, got %v", stubBody, requestBody)
+			return fmt.Errorf("Unexpected request body, expected %s, got %s", stubBody, requestBody)
 		}
 	}
 
